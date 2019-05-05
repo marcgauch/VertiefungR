@@ -15,10 +15,27 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+## Disclaimer 
+
+> - Diese Präsentation wurde mit isoslides erstellt.
+
+> - Isoslides erlaubt kein Inhaltsverzeichnis
+
+> - Es gibt doch eine Lösung
+
+> - Die Aufzeichnis ist nur in Kleinbuchstaben
+
+> - Ich habe das JS angepasst
+
+> - Camel & Pascal Case geht nicht
+
+> - ¯&#92;&#95;(ツ)&#95;/¯
+
 ## Inhalt
 
 <!-- add div element table of content for javascript to fill -->
 <div id="toc"></div>
+
 
 ## Aufgabenstellung {.section}
 
@@ -51,8 +68,12 @@ This is my *note*.
 </div>
 
 
+## Quellen
 
+Inhaltsverzeichnis
+http://rpubs.com/ShKlinkenberg/TOC-for-IOslides-in-Rmarkdown
 
+# Diskussion {.section}
 
 ## R Markdown
 

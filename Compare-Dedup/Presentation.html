@@ -44,7 +44,22 @@
   document.addEventListener('DOMContentLoaded', function() {
     TableOfContents();
   }
-  );                        
+  );     
+  
+  function capitalise(input) {
+    let returnString = ''
+    let lastWasSpace = true
+    for (let i = 0; i < input.length; i++) {
+      const c = input.charAt(i)
+      if (lastWasSpace) {
+        returnString += c.toUpperCase()
+      } else {
+        returnString += c
+      }
+      lastWasSpace = (c === ' ')
+    }
+    return returnString
+  }
   
   function TableOfContents(container, output) {
   
@@ -67,7 +82,7 @@
           
           // Replace - in id with whitespace
           var titleText = id.replace(/-/gi, " ");
-          titleText = titleText.charAt(0).toUpperCase() + titleText.slice(1);
+          titleText = capitalise(titleText)
           
           // Add text to list element
           item.appendChild(document.createTextNode(titleText));
@@ -3167,20 +3182,50 @@ slide:not(.current) .plotly.html-widget{
           </hgroup>
   </slide>
 
-<slide class=""><hgroup><h2>Inhalt</h2></hgroup><article  id="inhalt">
+<slide class=""><hgroup><h2>Disclaimer</h2></hgroup><article  id="disclaimer">
+
+<ul class = 'build'>
+<li>Diese Präsentation wurde mit isoslides erstellt.</li>
+</ul>
+
+<ul class = 'build'>
+<li>Isoslides erlaubt kein Inhaltsverzeichnis</li>
+</ul>
+
+<ul class = 'build'>
+<li>Es gibt doch eine Lösung</li>
+</ul>
+
+<ul class = 'build'>
+<li>Die Aufzeichnis ist nur in Kleinbuchstaben</li>
+</ul>
+
+<ul class = 'build'>
+<li>Ich habe das JS angepasst</li>
+</ul>
+
+<ul class = 'build'>
+<li>Camel &amp; Pascal Case geht nicht</li>
+</ul>
+
+<ul class = 'build'>
+<li>¯\_(ツ)_/¯</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Inhalt</h2></hgroup><article  id="inhalt">
 
 <!-- add div element table of content for javascript to fill -->
 
 <div id="toc">
 </div>
 
-</article></slide><slide class=""><hgroup><h2>Aufgabenstellung</h2></hgroup><article  id="aufgabenstellung" class="section">
+</article></slide><slide class=""><hgroup><h2>Aufgabenstellung</h2></hgroup><article  class="section" id="aufgabenstellung">
 
 <blockquote>
 <p>Die Vorstellung der compare.dedup-Funktion im RecordLinkage-Package und potentieller Probleme mit potentiellen Lösungen</p>
 </blockquote>
 
-</article></slide><slide class=""><hgroup><h2>Installation Record Linkage</h2></hgroup><article  id="installation-record-linkage" class="section">
+</article></slide><slide class=""><hgroup><h2>Installation Record Linkage</h2></hgroup><article  class="section" id="installation-record-linkage">
 
 <p>Library <em>RecordLinkage</em> installieren:</p>
 
@@ -3204,6 +3249,12 @@ slide:not(.current) .plotly.html-widget{
 <li>It can contain markdown</li>
 <li>like this list</li>
 </ul></section></aside>
+
+</article></slide><slide class=""><hgroup><h2>Quellen</h2></hgroup><article  id="quellen">
+
+<p>Inhaltsverzeichnis <a href='http://rpubs.com/ShKlinkenberg/TOC-for-IOslides-in-Rmarkdown' title=''>http://rpubs.com/ShKlinkenberg/TOC-for-IOslides-in-Rmarkdown</a></p>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Diskussion</h2></hgroup><article  class="section" id="diskussion">
 
 </article></slide><slide class=""><hgroup><h2>R Markdown</h2></hgroup><article  id="r-markdown">
 

@@ -2,7 +2,22 @@
 document.addEventListener('DOMContentLoaded', function() {
   TableOfContents();
 }
-);                        
+);     
+
+function capitalise(input) {
+  let returnString = ''
+  let lastWasSpace = true
+  for (let i = 0; i < input.length; i++) {
+    const c = input.charAt(i)
+    if (lastWasSpace) {
+      returnString += c.toUpperCase()
+    } else {
+      returnString += c
+    }
+    lastWasSpace = (c === ' ')
+  }
+  return returnString
+}
 
 function TableOfContents(container, output) {
 
@@ -25,7 +40,7 @@ idfromclass = document.querySelectorAll('.section, .subsection');
         
         // Replace - in id with whitespace
         var titleText = id.replace(/-/gi, " ");
-        titleText = titleText.charAt(0).toUpperCase() + titleText.slice(1);
+        titleText = capitalise(titleText)
         
         // Add text to list element
         item.appendChild(document.createTextNode(titleText));
