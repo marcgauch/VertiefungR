@@ -1,24 +1,125 @@
+.packages(TRUE)
 
-install.packages("RecordLinkage")
+# FUNCTIONEN: Durchsucht Beschreibung und Tablelenname, SPaltennamen nach wert
+# wert kann mit so gesucht werden:
+# wert
+# w*t
+# w?rt
 
-library(RecordLinkage)
+# optionen: Regex, CaseSensitive
 
-install.packages("tibble")
+# Packet enhtält nur eine FUnktion
+# packet enthält vignette
 
-library(tibble)
+#such in:
+# beschreibung des packets
+# data(package = 'survival') -> text der da kommtn
+# jede tabelle, die bei data(package= 'survival') kommt in den spaltennamen
 
-tibble(a = 1, b = 1:3)
+#https://www.regular-expressions.info/rlanguage.html
 
-# quelle: https://www.bfs.admin.ch/bfs/de/home/statistiken/bevoelkerung/geburten-todesfaelle/vornamen-schweiz.assetdetail.5946318.html
-NAMES_MALE <- c("Daniel", "Peter", "Thomas", "Hans", "Christian", "Martin", "Andreas", "Michael", "Markus", "Marco", "David", "Patrick", "Stefan", "Walter", "Bruno", "Urs", "René", "Marcel", "Roland", "Werner", "Simon", "Pascal", "Beat", "Marc", "Paul", "Kurt", "Roger", "Manuel", "André", "Josef", "Rolf", "Antonio", "Heinz", "Luca", "Rudolf", "Michel", "Robert", "Nicolas", "Christoph", "Jean", "Samuel", "José", "Adrian", "Ernst", "Lukas", "Mario", "Reto", "Philippe", "Fabian", "Alfred", "Matthias", "Alexander", "Philipp", "Stephan", "Pierre", "Jürg", "Florian", "Benjamin", "Jan", "Anton", "Franz", "Giuseppe", "Johann", "Max", "Kevin", "Fabio", "Roman", "Oliver", "Sandro", "Ulrich", "Tobias", "Dominik", "Fritz", "Alain", "Karl", "Jonas", "Olivier", "Gabriel", "Alexandre", "Francesco", "Eric", "Bernhard", "Claudio", "Raphael", "Felix", "Dario", "Noah", "Claude", "Alessandro", "Albert", "Yves", "Richard", "Carlos", "Erich", "Sven", "Robin", "Ivan", "Roberto", "Remo", "Jakob")
-NAMES_FEMALE <- c("Maria", "Anna", "Ursula", "Sandra", "Ruth", "Elisabeth", "Monika", "Claudia", "Verena", "Nicole", "Barbara", "Silvia", "Andrea", "Marie", "Daniela", "Christine", "Karin", "Marianne", "Erika", "Brigitte", "Margrit", "Laura", "Susanne", "Rita", "Sarah", "Katharina", "Esther", "Rosmarie", "Heidi", "Anita", "Manuela", "Doris", "Beatrice", "Sonja", "Rosa", "Yvonne", "Sara", "Jacqueline", "Gertrud", "Ana", "Irene", "Franziska", "Julia", "Cornelia", "Fabienne", "Gabriela", "Martina", "Eva", "Patricia", "Isabelle", "Sabrina", "Nathalie", "Edith", "Alexandra", "Corinne", "Melanie", "Angela", "Nadine", "Alice", "Elena", "Jessica", "Vanessa", "Denise", "Simone", "Anne", "Sophie", "Regula", "Nina", "Caroline", "Emma", "Susanna", "Carmen", "Tanja", "Lara", "Catherine", "Sabine", "Lea", "Petra", "Céline", "Jasmin", "Stefanie", "Therese", "Nadia", "Tamara", "Johanna", "Chantal", "Marina", "Michelle", "Christina", "Martha", "Monique", "Adelheid", "Rahel", "Dora", "Lisa", "Janine", "Hedwig", "Pia", "Anja", "Diana")
+data <- data(package = 'survival')
+View(data$results)
+
+desc <- packageDescription("survival")
+View(desc) 
+
+help <- help(package = "survival", help_type="text" )
+View(help$info)
+
+findInPackageName <- function(needle, packagename){
+  return(length(grep(needle, packagename)) > 0)
+}
+
+findInPackageDescription <- function(needle, packagename){
+  description <- packageDescription(packagename)
+  return(length(grep(needle, description)) > 0)
+}
+
+findInPackageHelp <- function(needle, packagename){
+  help <- help(package = print(packagename), help_type="text" )
+  return(length(grep(needle, help)) > 0)
+}
 
 
-data(RLdata500)
-RLdata500[1:5, ]
-str(RLdata500)
-RLdata500
-data <- as_tibble(RLdata500)
 
-rparis <- compare.dedup(RLdata500, identity = identity.RLdata500)
-rparis$pairs
+findData <- function(
+  needle,
+  asRegex=FALSE,
+  caseSensitive=FALSE,
+  lookInPackagename=TRUE,
+  lookInDescription=TRUE,
+  lookInHelp=FALSE,
+){
+  # Save all packages
+  PACKAGES <- .packages(TRUE)
+  # create the return matrix
+  collectedData = data.frame(PACKAGES)
+  # give the column a name
+  colnames(collectedData) <- "PackageName"
+  
+  
+  # Check packagename if requested
+  if (lookInPackagename){
+    # add new column to resulttable
+    collectedData <- cbind(collectedData, FALSE)
+    # name the newly generatred column
+    colnames(collectedData)[length(collectedData)] <- "Name"
+    # check for every element
+    for (i in 1:nrow(collectedData)){
+      # if its found
+      if(findInPackageName(needle, collectedData[i, 1])) {
+        # write TRUE in the column "Name"
+        collectedData[i, length(collectedData)] <- TRUE
+      }
+    }
+  }
+  
+  # Check packagename if requested
+  if (lookInHelp){
+    # add new column to resulttable
+    collectedData <- cbind(collectedData, FALSE)
+    # name the newly generatred column
+    colnames(collectedData)[length(collectedData)] <- "Description"
+    # check for every element
+    for (i in 1:nrow(collectedData)){
+      # if its found
+      if(findInPackageDescription(needle, collectedData[i, 1])) {
+        # write TRUE in the column
+        collectedData[i, length(collectedData)] <- TRUE
+      }
+    }
+  }  
+  
+  # Check packagename if requested
+  if (lookInDescription){
+    # add new column to resulttable
+    collectedData <- cbind(collectedData, FALSE)
+    # name the newly generatred column
+    colnames(collectedData)[length(collectedData)] <- "Help"
+    # check for every element
+    for (i in 1:nrow(collectedData)){
+      # if its found
+      if(findInPackageHelp(needle, collectedData[i, 1])) {
+        # write TRUE in the column
+        collectedData[i, length(collectedData)] <- TRUE
+      }
+    }
+  }
+  
+  # Remove Packages that have false everywhere
+  toKeep <- apply(collectedData[,2:length(collectedData)], 1,  sum) > 0
+  collectedData <- collectedData[toKeep,]
+  
+  # sort
+  
+  # reset row numbering
+  rownames(collectedData) <- seq(length=nrow(collectedData))
+  
+  # Return everything
+  collectedData
+}
+
+a <- findData("marc")
+a
+
