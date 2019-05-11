@@ -27,21 +27,22 @@ View(desc)
 help <- help(package = "survival", help_type="text" )
 View(help$info)
 
-findInPackageName <- function(needle, packagename){
-  return(length(grep(needle, packagename)) > 0)
+## Helper function that searches through the haystack and returns TRUE if something was found
+find <- function (needle, haystack){
+  return(length(grep(needle, haystack)) > 0)
 }
 
-findInPackageDescription <- function(needle, packagename){
-  description <- packageDescription(packagename)
-  return(length(grep(needle, description)) > 0)
+findInPackageName <- function(needle, packagenames){
+  return(apply(packagenames, 1, function(packagename) find(needle, packagename)))
 }
 
-findInPackageHelp <- function(needle, packagename){
-  help <- help(package = print(packagename), help_type="text" )
-  return(length(grep(needle, help)) > 0)
+findInPackageDescription <- function(needle, packagenames){
+  return(apply(packagenames, 1, function(packagename) find(needle, packageDescription(packagename))))
 }
 
-
+findInPackageHelp <- function(needle, packagenames){
+  return(apply(packagenames, 1, function(packagename) find(needle, help(package = eval(packagename), help_type="text"))))
+}
 
 findData <- function(
   needle,
@@ -49,62 +50,30 @@ findData <- function(
   caseSensitive=FALSE,
   lookInPackagename=TRUE,
   lookInDescription=TRUE,
-  lookInHelp=FALSE,
+  lookInHelp=TRUE,
+  lookInVignette=TRUE,
+  lookInData=TRUE,
+  lookInDataHeaders=TRUE,
+  lookInDataValues=TRUE
 ){
   # Save all packages
-  PACKAGES <- .packages(TRUE)
+  PACKAGES <- transform(.packages(TRUE))
   # create the return matrix
   collectedData = data.frame(PACKAGES)
   # give the column a name
   colnames(collectedData) <- "PackageName"
   
   
-  # Check packagename if requested
   if (lookInPackagename){
-    # add new column to resulttable
-    collectedData <- cbind(collectedData, FALSE)
-    # name the newly generatred column
-    colnames(collectedData)[length(collectedData)] <- "Name"
-    # check for every element
-    for (i in 1:nrow(collectedData)){
-      # if its found
-      if(findInPackageName(needle, collectedData[i, 1])) {
-        # write TRUE in the column "Name"
-        collectedData[i, length(collectedData)] <- TRUE
-      }
-    }
+    collectedData <- cbind(collectedData, "Name" = findInPackageName(needle, PACKAGES))
   }
   
-  # Check packagename if requested
-  if (lookInHelp){
-    # add new column to resulttable
-    collectedData <- cbind(collectedData, FALSE)
-    # name the newly generatred column
-    colnames(collectedData)[length(collectedData)] <- "Description"
-    # check for every element
-    for (i in 1:nrow(collectedData)){
-      # if its found
-      if(findInPackageDescription(needle, collectedData[i, 1])) {
-        # write TRUE in the column
-        collectedData[i, length(collectedData)] <- TRUE
-      }
-    }
+  if (lookInDescription){
+    collectedData <- cbind(collectedData, "Description" = findInPackageDescription(needle, PACKAGES))
   }  
   
-  # Check packagename if requested
-  if (lookInDescription){
-    # add new column to resulttable
-    collectedData <- cbind(collectedData, FALSE)
-    # name the newly generatred column
-    colnames(collectedData)[length(collectedData)] <- "Help"
-    # check for every element
-    for (i in 1:nrow(collectedData)){
-      # if its found
-      if(findInPackageHelp(needle, collectedData[i, 1])) {
-        # write TRUE in the column
-        collectedData[i, length(collectedData)] <- TRUE
-      }
-    }
+  if (lookInHelp){
+    collectedData <- cbind(collectedData, "Help" = findInPackageHelp(needle, PACKAGES))
   }
   
   # Remove Packages that have false everywhere
@@ -120,6 +89,5 @@ findData <- function(
   collectedData
 }
 
-a <- findData("marc")
-a
+a <- findData("ada")
 
