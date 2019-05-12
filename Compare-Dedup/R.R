@@ -32,17 +32,57 @@ find <- function (needle, haystack){
   return(length(grep(needle, haystack)) > 0)
 }
 
-findInPackageName <- function(needle, packagenames){
-  return(apply(packagenames, 1, function(packagename) find(needle, packagename)))
+findInPackageName <- function(needle, packages){
+  return(apply(packages, 1, function(packagename) find(needle, packagename)))
 }
 
-findInPackageDescription <- function(needle, packagenames){
-  return(apply(packagenames, 1, function(packagename) find(needle, packageDescription(packagename))))
+findInPackageDescription <- function(needle, packages){
+  return(apply(packages, 1, function(packagename) find(needle, packageDescription(packagename))))
 }
 
-findInPackageHelp <- function(needle, packagenames){
-  return(apply(packagenames, 1, function(packagename) find(needle, help(package = eval(packagename), help_type="text"))))
+findInPackageHelp <- function(needle, packages){
+  return(apply(packages, 1, function(packagename) find(needle, help(package = eval(packagename), help_type="text"))))
 }
+
+findInData <- function(needle, packages){
+    # create an empty list for the results
+    returnList <- c()
+    
+    # foreach packagename
+    for (package in packages[[1]]){
+      
+      # Ignore Package 'base' and 'stats' they have no data and throw a warning
+      if (package == 'base' || package == 'stats') {
+        returnList <- c(returnList, FALSE)
+      } else {
+        # get data information for certain package
+        packageData <- data(package = eval(package))
+        # only the results are important
+        packageData <- packageData$results
+
+        
+        if (length(packageData) == 0) {
+          # NO DATA HERE
+          returnList <- c(returnList, FALSE)
+        } else if (length(packageData) == 4){
+          # exactly one package
+          
+          # find for the needle in the columns item and title
+          res <- lapply(packageData[,3:4], function(x) find(needle, x))
+          # if one of them has the word in it return true
+          returnList <- c(returnList, (res$Item || res$Title))
+        } else {
+          # more than one
+          returnList <- c(returnList, sum(apply(packageData[,3:4], 2, function(x) find(needle, x))) > 0)
+        }
+      }
+    }
+    
+    return(returnList)
+    
+}
+findInData("veteran", q)
+
 
 findData <- function(
   needle,
@@ -76,6 +116,10 @@ findData <- function(
     collectedData <- cbind(collectedData, "Help" = findInPackageHelp(needle, PACKAGES))
   }
   
+  if (lookInData){
+    collectedData <- cbind(collectedData, "Data" = findInData(needle, PACKAGES))
+  }
+  
   # Remove Packages that have false everywhere
   toKeep <- apply(collectedData[,2:length(collectedData)], 1,  sum) > 0
   collectedData <- collectedData[toKeep,]
@@ -89,5 +133,5 @@ findData <- function(
   collectedData
 }
 
-a <- findData("ada")
-
+a <- findData("Veteran")
+a
