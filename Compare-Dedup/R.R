@@ -28,23 +28,23 @@ help <- help(package = "survival", help_type="text" )
 View(help$info)
 
 ## Helper function that searches through the haystack and returns TRUE if something was found
-find <- function (needle, haystack){
-  return(length(grep(needle, haystack)) > 0)
+find <- function (needle, haystack, ignorecase, ...){
+  return(length(grep(pattern = needle, x = haystack, ignore.case = ignorecase, ...)) > 0)
 }
 
-findInPackageName <- function(needle, packages){
-  return(apply(packages, 1, function(packagename) find(needle, packagename)))
+findInPackageName <- function(needle, packages, ignore.case, ...){
+  return(apply(packages, 1, function(packagename) find(needle, packagename, ignore.case, ...)))
 }
 
-findInPackageDescription <- function(needle, packages){
-  return(apply(packages, 1, function(packagename) find(needle, packageDescription(packagename))))
+findInPackageDescription <- function(needle, packages, ignore.case, ...){
+  return(apply(packages, 1, function(packagename) find(needle, packageDescription(packagename), ignore.case, ...)))
 }
 
-findInPackageHelp <- function(needle, packages){
-  return(apply(packages, 1, function(packagename) find(needle, help(package = eval(packagename), help_type="text"))))
+findInPackageHelp <- function(needle, packages, ignore.case, ...){
+  return(apply(packages, 1, function(packagename) find(needle, help(package = eval(packagename), help_type="text"), ignore.case,...)))
 }
 
-findInData <- function(needle, packages){
+findInData <- function(needle, packages, ignore.case, ...){
     # create an empty list for the results
     returnList <- c()
     
@@ -68,12 +68,12 @@ findInData <- function(needle, packages){
           # exactly one package
           
           # find for the needle in the columns item and title
-          res <- lapply(packageData[,3:4], function(x) find(needle, x))
+          res <- lapply(packageData[,3:4], function(x) find(needle, x, ignore.case, ...))
           # if one of them has the word in it return true
           returnList <- c(returnList, (res$Item || res$Title))
         } else {
           # more than one
-          returnList <- c(returnList, sum(apply(packageData[,3:4], 2, function(x) find(needle, x))) > 0)
+          returnList <- c(returnList, sum(apply(packageData[,3:4], 2, function(x) find(needle, x, ignore.case, ...))) > 0)
         }
       }
     }
@@ -81,43 +81,40 @@ findInData <- function(needle, packages){
     return(returnList)
     
 }
-findInData("veteran", q)
 
 
-findData <- function(
+findInPackages <- function(
   needle,
-  asRegex=FALSE,
-  caseSensitive=FALSE,
+  ...,
+  ignore.case=TRUE,
   lookInPackagename=TRUE,
   lookInDescription=TRUE,
   lookInHelp=TRUE,
-  lookInVignette=TRUE,
   lookInData=TRUE,
-  lookInDataHeaders=TRUE,
-  lookInDataValues=TRUE
+  resultFilteredByMatches=FALSE
 ){
   # Save all packages
   PACKAGES <- transform(.packages(TRUE))
   # create the return matrix
   collectedData = data.frame(PACKAGES)
   # give the column a name
-  colnames(collectedData) <- "PackageName"
+  colnames(collectedData) <- "Package"
   
   
   if (lookInPackagename){
-    collectedData <- cbind(collectedData, "Name" = findInPackageName(needle, PACKAGES))
+    collectedData <- cbind(collectedData, "Packagename" = findInPackageName(needle, PACKAGES, ignore.case, ...))
   }
   
   if (lookInDescription){
-    collectedData <- cbind(collectedData, "Description" = findInPackageDescription(needle, PACKAGES))
+    collectedData <- cbind(collectedData, "Description" = findInPackageDescription(needle, PACKAGES, ignore.case, ...))
   }  
   
   if (lookInHelp){
-    collectedData <- cbind(collectedData, "Help" = findInPackageHelp(needle, PACKAGES))
+    collectedData <- cbind(collectedData, "Help" = findInPackageHelp(needle, PACKAGES, ignore.case, ...))
   }
   
   if (lookInData){
-    collectedData <- cbind(collectedData, "Data" = findInData(needle, PACKAGES))
+    collectedData <- cbind(collectedData, "Data" = findInData(needle, PACKAGES, ignore.case, ...))
   }
   
   # Remove Packages that have false everywhere
@@ -133,5 +130,5 @@ findData <- function(
   collectedData
 }
 
-a <- findData("Veteran")
+a <- findInPackages("Smok")
 a

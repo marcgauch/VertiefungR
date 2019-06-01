@@ -1,0 +1,11 @@
+Package: findInPackages
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Author: Marc Gauch, David Nowak
+Maintainer: Marc Gauch <contact.marc@gauch.ch>
+Description: Function that allows you to search in all installed packages for a specific string
+License: GNU GPLv3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
