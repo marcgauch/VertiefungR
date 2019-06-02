@@ -14,7 +14,7 @@
 #' @return
 #' \code{findInPackages("mtcars")} returns a table with all Packages that match for the word \emph{mtcars} in either the packagename, description, help or data
 #'
-#' @export findInPackagesc
+#' @export findInPackages
 #'
 #' @examples
 #' findInPackages("mtcars")
@@ -90,10 +90,10 @@ findInPackages <- function(
   lookInData=TRUE,
   showOnlyContaining=TRUE
 ){
-  # Save all packages
+  # get and transform all installed packages
   PACKAGES <- transform(.packages(TRUE))
   # create the return matrix
-  collectedData = data.frame(PACKAGES)
+  collectedData <- data.frame(PACKAGES)
   # give the column a name
   colnames(collectedData) <- "Package"
 
