@@ -420,7 +420,7 @@ findInPackages <- function(
 
 ```
 
-## Elipsis witergeben
+## Elipsis weitergeben
 ```{r, echo=TRUE, eval=FALSE}
 find <- function (needle, haystack, ignorecase, ...){
   return(length(grep(pattern = needle, x = haystack, ignore.case = ignorecase, ...)) > 0)
